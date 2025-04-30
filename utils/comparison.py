@@ -38,7 +38,7 @@ def preprocess(img):
 
 def calculate_metrics(ref, img):
     metrics = {}
-    metrics['SSIM'] = ssim(ref, img)
+    metrics['SSIM'] = ssim(ref, img) if len(ref.shape) == 2 else ssim(ref, img, channel_axis=2)
     metrics['MSE'] = mean_squared_error(ref, img)
     metrics['MAE'] = mean_absolute_error(ref.flatten(), img.flatten())
     metrics['PSNR'] = peak_signal_noise_ratio(ref, img)
@@ -67,3 +67,15 @@ def plot_comparison(images, results):
     plt.tight_layout()
     plt.show()
 
+def generate_pixel_img(rgb_func, width, height, c=[1,2,3]):
+    m = np.linspace(1, width, width)
+    n = np.linspace(1, height, height)
+    m_grid, n_grid = np.meshgrid(m, n)
+
+    r = rgb_func(m_grid, n_grid, c[0])
+    g = rgb_func(m_grid, n_grid, c[1])
+    b = rgb_func(m_grid, n_grid, c[2])
+
+    rgb_image = np.stack([r, g, b], axis=-1).astype(np.uint8)
+    
+    return rgb_image
